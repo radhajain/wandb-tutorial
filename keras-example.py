@@ -5,9 +5,7 @@ Gets to 99.25% test accuracy after 12 epochs
 '''
 
 from __future__ import print_function
-import wandb
 
-from wandb.keras import WandbCallback
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -16,9 +14,15 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
 import random
 
+#Import the Wandb libraries
+import wandb
+from wandb.keras import WandbCallback
+
+#Set up the wandb environment
 run = wandb.init()
 config = run.config
 
+#Track hyperparameters with wandb
 config.num_classes = 10
 config.batch_size = 64
 config.epochs = 8
@@ -27,12 +31,11 @@ config.beta_1 = 0.9
 config.beta_2 = 0.999
 
 
-# input image dimensions
+# Input image dimensions
 img_rows, img_cols = 28, 28
 
-# the data, split between train and test sets
+# Split data between training and test
 (x_train_orig, y_train_orig), (x_test, y_test) = mnist.load_data()
-
 
 # Reducing the dataset size to 2/3rd of the original size for faster train time
 true = list(map(lambda x: True if random.random() > 0.33 else False, range(60000)))
@@ -68,12 +71,9 @@ model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
                  activation='relu',
                  input_shape=input_shape))
-#model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(4, 4)))
-#model.add(Dropout(0.25))
 model.add(Flatten())
 model.add(Dense(128, activation='relu'))
-#model.add(Dropout(0.5))
 model.add(Dense(config.num_classes, activation='softmax'))
 
 
@@ -81,6 +81,7 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adam(lr=config.lr, beta_1=config.beta_1, beta_2=config.beta_2),
               metrics=['accuracy'])
 
+#Add the wandb callback to model.fit
 model.fit(x_train, y_train,
           batch_size=config.batch_size,
           epochs=config.epochs,
