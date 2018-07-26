@@ -10,11 +10,16 @@ from keras.utils import np_utils
 from keras.optimizers import SGD
 from keras.callbacks import TensorBoard
 import random
+
+#Import wandb libraries
 import wandb
 from wandb.keras import WandbCallback
 
+#initialize wandb
 wandb.init()
 config = wandb.config
+
+#Track hyperparameters
 config.dropout = 0.2
 config.hidden_layer_size = 128
 config.layer_1_size  = 16
@@ -69,6 +74,7 @@ model.add(Flatten())
 model.add(Dense(config.hidden_layer_size, activation='relu'))
 model.add(Dense(num_classes, activation='softmax'))
 
+#Add keras WandbCallback to model fit
 model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 model.fit(X_train, y_train,  validation_data=(X_test, y_test), epochs=config.epochs,
     callbacks=[WandbCallback(data_type="image", labels=labels)])
