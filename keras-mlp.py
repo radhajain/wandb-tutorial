@@ -13,6 +13,8 @@ run = wandb.init()
 config = run.config
 
 config.hidden_nodes = 100
+config.epochs = 10
+config.dropout = 0.4
 
 # load data
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -35,12 +37,14 @@ num_classes = y_train.shape[1]
 # create model
 model=Sequential()
 model.add(Flatten(input_shape=(img_width,img_height)))
+model.add(Dropout(config.dropout))
 model.add(Dense(config.hidden_nodes, activation='relu'))
+model.add(Dropout(config.dropout))
 model.add(Dense(num_classes, activation='softmax'))
-model.compile(loss='categorical_crossentropy', optimizer=config.optimizer,
+model.compile(loss='categorical_crossentropy', optimizer='adam',
                     metrics=['accuracy'])
 
 # Fit the model
 model.fit(X_train, y_train, validation_data=(X_test, y_test), 
       epochs=config.epochs,
-      callbacks=[WandbCallback(validation_data=X_test, labels=labels)])
+      callbacks=[WandbCallback(validation_data=X_test, labels=labels, data_type="image")])
