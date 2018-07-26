@@ -9,6 +9,7 @@ git clone http://github.com/radhajain/wandb-tutorial
 
 2. Next, install the requirements required to run the scripts
 
+cd wandb-tutorial
 pip install -r requirements.txt
 
 3. Finally, initialize the wandb directory and follow the instructions
